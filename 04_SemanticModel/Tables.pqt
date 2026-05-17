@@ -1,0 +1,1537 @@
+createOrReplace
+
+	table Dim_Country
+		lineageTag: 7b72053e-661b-4805-a932-d53a11806b41
+
+		column Sk_Country
+			dataType: int64
+			formatString: 0
+			lineageTag: ddaa76df-11f1-43bc-b372-e47f14e70d2b
+			summarizeBy: none
+			sourceColumn: Sk_Country
+
+			annotation SummarizationSetBy = Automatic
+
+		column Country_Code
+			dataType: string
+			lineageTag: 7e3d5f3a-d691-434a-a110-b3aea5909cf3
+			dataCategory: Country
+			summarizeBy: none
+			sourceColumn: Country_Code
+
+			annotation SummarizationSetBy = Automatic
+
+		column Country_Name
+			dataType: string
+			lineageTag: 37fade07-2acf-4313-9d25-b7a84e9dab20
+			summarizeBy: none
+			sourceColumn: Country_Name
+
+			annotation SummarizationSetBy = Automatic
+
+		column Country_Map =
+				
+				SWITCH(
+				    TRUE(),
+				    LEFT(Dim_Country[Country_Code], 2) = "BE", "Belgium",
+				    Dim_Country[Country_Name]
+				)
+			lineageTag: 8155d61a-ebdb-4203-9422-356f1a057f43
+			dataCategory: Country
+			summarizeBy: none
+
+			annotation SummarizationSetBy = Automatic
+
+		column Country_Name_Clean =
+				
+				SWITCH(
+				    TRUE(),
+				    CONTAINSSTRING(Dim_Country[Country_Name], "German-"), "Belgium German",
+				    CONTAINSSTRING(Dim_Country[Country_Name], "French "), "Belgium French",
+				    CONTAINSSTRING(Dim_Country[Country_Name], "Flemish "), "Belgium Flemish",
+				    Dim_Country[Country_Name]
+				)
+			lineageTag: 6893735d-b6f2-4768-b03b-8f3c1bb1069f
+			summarizeBy: none
+
+			annotation SummarizationSetBy = Automatic
+
+		partition Dim_Country = m
+			mode: import
+			source =
+					let
+					    Origem = Sql.Database("75u33zhx4yxezmshig2uxisjby-tvg7dn3nimwenndimwrqen6tf4.datawarehouse.fabric.microsoft.com", "DW_TEACHER_SALARIES"),
+					    dbo_Dim_Country = Origem{[Schema="dbo",Item="Dim_Country"]}[Data]
+					in
+					    dbo_Dim_Country
+
+		annotation PBI_NavigationStepName = Navegação
+
+		annotation PBI_ResultType = Table
+
+	table Dim_Currency
+		lineageTag: a7a897be-4103-4ec2-92f9-4db3c41f4b19
+
+		column Sk_Currency
+			dataType: int64
+			formatString: 0
+			lineageTag: c51b62ce-a46c-4804-acf5-170e2a91e616
+			summarizeBy: none
+			sourceColumn: Sk_Currency
+
+			annotation SummarizationSetBy = Automatic
+
+		column Currency_Code
+			dataType: string
+			lineageTag: fe471c5d-e1e2-47d4-b3c6-9db791a4ecb0
+			summarizeBy: none
+			sourceColumn: Currency_Code
+
+			annotation SummarizationSetBy = Automatic
+
+		column Currency_Name
+			dataType: string
+			lineageTag: e289ac17-0fec-45ea-882c-76a9aee20f59
+			summarizeBy: none
+			sourceColumn: Currency_Name
+
+			annotation SummarizationSetBy = Automatic
+
+		column Currency_Symbol
+			dataType: string
+			lineageTag: 452b9bbc-3c2a-4bd2-b4f4-9e84c0620c69
+			summarizeBy: none
+			sourceColumn: Currency_Symbol
+
+			annotation SummarizationSetBy = Automatic
+
+		column Currency_Display
+			dataType: string
+			lineageTag: e001d2a6-9548-4c7c-a416-b3598960f7ac
+			summarizeBy: none
+			sourceColumn: Currency_Display
+
+			annotation SummarizationSetBy = Automatic
+
+		partition Dim_Currency = m
+			mode: import
+			source =
+					let
+					    Origem = Sql.Database("75u33zhx4yxezmshig2uxisjby-tvg7dn3nimwenndimwrqen6tf4.datawarehouse.fabric.microsoft.com", "DW_TEACHER_SALARIES"),
+					    dbo_Dim_Currency = Origem{[Schema="dbo",Item="Dim_Currency"]}[Data]
+					in
+					    dbo_Dim_Currency
+
+		annotation PBI_NavigationStepName = Navegação
+
+		annotation PBI_ResultType = Exception
+
+	table Dim_Indicator
+		lineageTag: 1e30fb97-b116-46ff-bfd7-1ff6a5fe4689
+
+		column Sk_Indicator
+			dataType: int64
+			formatString: 0
+			lineageTag: aac4d4f3-fd0e-43b1-84d3-08d8e4b6d7ff
+			summarizeBy: none
+			sourceColumn: Sk_Indicator
+
+			annotation SummarizationSetBy = Automatic
+
+		column Indicator
+			dataType: string
+			lineageTag: 4b8953ea-52fc-4f83-8f46-cfb141f57845
+			summarizeBy: none
+			sourceColumn: Indicator
+
+			annotation SummarizationSetBy = Automatic
+
+		column Unit
+			dataType: string
+			lineageTag: 5babdfc6-2472-43a6-a57e-38c1ea39338d
+			summarizeBy: none
+			sourceColumn: Unit
+
+			annotation SummarizationSetBy = Automatic
+
+		column Source
+			dataType: string
+			lineageTag: 588823d7-b731-4ac4-b7a2-6b4ec02dcf46
+			summarizeBy: none
+			sourceColumn: Source
+
+			annotation SummarizationSetBy = Automatic
+
+		partition Dim_Indicator = m
+			mode: import
+			source =
+					let
+					    Origem = Sql.Database("75u33zhx4yxezmshig2uxisjby-tvg7dn3nimwenndimwrqen6tf4.datawarehouse.fabric.microsoft.com", "DW_TEACHER_SALARIES"),
+					    dbo_Dim_Indicator = Origem{[Schema="dbo",Item="Dim_Indicator"]}[Data]
+					in
+					    dbo_Dim_Indicator
+
+		annotation PBI_NavigationStepName = Navegação
+
+		annotation PBI_ResultType = Table
+
+	table Dim_Isced
+		lineageTag: bba48bd8-b242-4088-909f-58622b5be2d3
+
+		column Sk_Isced
+			dataType: int64
+			formatString: 0
+			lineageTag: 78cc6ad5-344a-4515-b74a-c34ed52dcf71
+			summarizeBy: none
+			sourceColumn: Sk_Isced
+
+			annotation SummarizationSetBy = Automatic
+
+		column Isced_Code
+			dataType: string
+			lineageTag: 6d4c7686-78a8-4b9c-8fa0-3d6d9629cc06
+			summarizeBy: none
+			sourceColumn: Isced_Code
+			sortByColumn: Isced_Sort_Order
+
+			changedProperty = SortByColumn
+
+			annotation SummarizationSetBy = Automatic
+
+		column Isced_Level_Short
+			dataType: string
+			lineageTag: dc82449f-e7ad-4654-97d8-683ac8412b66
+			summarizeBy: none
+			sourceColumn: Isced_Level_Short
+			sortByColumn: Isced_Sort_Order
+
+			changedProperty = SortByColumn
+
+			annotation SummarizationSetBy = Automatic
+
+		column Isced_Level_Long
+			dataType: string
+			lineageTag: f8fe5f6a-dd99-4b87-b84a-eab4408c250a
+			summarizeBy: none
+			sourceColumn: Isced_Level_Long
+			sortByColumn: Isced_Sort_Order
+
+			changedProperty = SortByColumn
+
+			annotation SummarizationSetBy = Automatic
+
+		column Isced_Sort_Order
+			dataType: int64
+			formatString: 0
+			lineageTag: be3de405-7179-4f21-9b2e-8f4adddd0932
+			summarizeBy: none
+			sourceColumn: Isced_Sort_Order
+
+			annotation SummarizationSetBy = Automatic
+
+		partition Dim_Isced = m
+			mode: import
+			source =
+					let
+					    Origem = Sql.Database("75u33zhx4yxezmshig2uxisjby-tvg7dn3nimwenndimwrqen6tf4.datawarehouse.fabric.microsoft.com", "DW_TEACHER_SALARIES"),
+					    dbo_Dim_Isced = Origem{[Schema="dbo",Item="Dim_Isced"]}[Data]
+					in
+					    dbo_Dim_Isced
+
+		annotation PBI_NavigationStepName = Navegação
+
+		annotation PBI_ResultType = Table
+
+	table Dim_Qualification
+		lineageTag: 00f36f1e-edcc-404a-9f76-c0d873fa77c8
+
+		column Sk_Qualification
+			dataType: int64
+			formatString: 0
+			lineageTag: 309d0809-9bdf-4f09-aefb-a2c285053246
+			summarizeBy: none
+			sourceColumn: Sk_Qualification
+
+			annotation SummarizationSetBy = Automatic
+
+		column Qualification_Long
+			dataType: string
+			lineageTag: 556fdbdd-7035-4c20-aaae-8d8f005e1a17
+			summarizeBy: none
+			sourceColumn: Qualification_Long
+			sortByColumn: Qualification_Order
+
+			changedProperty = SortByColumn
+
+			annotation SummarizationSetBy = Automatic
+
+		column Qualification_Short
+			dataType: string
+			lineageTag: 2199de71-0335-4242-af07-92d885aa3076
+			summarizeBy: none
+			sourceColumn: Qualification_Short
+			sortByColumn: Qualification_Order
+
+			changedProperty = SortByColumn
+
+			annotation SummarizationSetBy = Automatic
+
+		column Qualification_Order
+			dataType: int64
+			formatString: 0
+			lineageTag: 7a782b33-e87d-4638-8f91-5adae1d31ddf
+			summarizeBy: none
+			sourceColumn: Qualification_Order
+
+			annotation SummarizationSetBy = Automatic
+
+		partition Dim_Qualification = m
+			mode: import
+			source =
+					let
+					    Origem = Sql.Database("75u33zhx4yxezmshig2uxisjby-tvg7dn3nimwenndimwrqen6tf4.datawarehouse.fabric.microsoft.com", "DW_TEACHER_SALARIES"),
+					    dbo_Dim_Qualification = Origem{[Schema="dbo",Item="Dim_Qualification"]}[Data]
+					in
+					    dbo_Dim_Qualification
+
+		annotation PBI_NavigationStepName = Navegação
+
+		annotation PBI_ResultType = Table
+
+	table Dim_Role
+		lineageTag: 0aa428d8-27e9-48cf-8fb9-182535b8197f
+
+		column Sk_Role
+			dataType: int64
+			formatString: 0
+			lineageTag: 3732206f-3a3b-422e-8975-fba4f76d3dd3
+			summarizeBy: none
+			sourceColumn: Sk_Role
+
+			annotation SummarizationSetBy = Automatic
+
+		column Role
+			dataType: string
+			lineageTag: 112124b8-3375-4651-8734-09012633a055
+			summarizeBy: none
+			sourceColumn: Role
+
+			annotation SummarizationSetBy = Automatic
+
+		column Tooltip
+			dataType: string
+			lineageTag: d47fbfd2-8df8-4de0-840c-0afc75946f4a
+			summarizeBy: none
+			sourceColumn: Tooltip
+
+			annotation SummarizationSetBy = Automatic
+
+		partition Dim_Role = m
+			mode: import
+			source =
+					let
+					    Origem = Sql.Database("75u33zhx4yxezmshig2uxisjby-tvg7dn3nimwenndimwrqen6tf4.datawarehouse.fabric.microsoft.com", "DW_TEACHER_SALARIES"),
+					    dbo_Dim_Role = Origem{[Schema="dbo",Item="Dim_Role"]}[Data]
+					in
+					    dbo_Dim_Role
+
+		annotation PBI_NavigationStepName = Navegação
+
+		annotation PBI_ResultType = Table
+
+	table Dim_Salary_Stage
+		lineageTag: 846249e1-6664-44fc-bf50-bd0657f10832
+
+		column Sk_Salary_Stage
+			dataType: int64
+			formatString: 0
+			lineageTag: d90fa1df-ebbe-4ebe-831f-939963dd5556
+			summarizeBy: none
+			sourceColumn: Sk_Salary_Stage
+
+			annotation SummarizationSetBy = Automatic
+
+		column Salary_Stage
+			dataType: string
+			lineageTag: 904d903c-7f55-473e-b0a5-7ce8ceea310e
+			summarizeBy: none
+			sourceColumn: Salary_Stage
+			sortByColumn: Salary_Stage_Order
+
+			changedProperty = SortByColumn
+
+			annotation SummarizationSetBy = Automatic
+
+		column Salary_Stage_Order
+			dataType: int64
+			formatString: 0
+			lineageTag: 12b5ef8d-03cf-475c-97aa-2bf12aa1675e
+			summarizeBy: sum
+			sourceColumn: Salary_Stage_Order
+
+			annotation SummarizationSetBy = Automatic
+
+		column Salary_Stage_Short
+			dataType: string
+			lineageTag: 3977f7d9-31bf-40be-a49b-b5d9df1e883e
+			summarizeBy: none
+			sourceColumn: Salary_Stage_Short
+			sortByColumn: Salary_Stage_Order
+
+			changedProperty = SortByColumn
+
+			annotation SummarizationSetBy = Automatic
+
+		partition Dim_Salary_Stage = m
+			mode: import
+			source =
+					let
+					    Origem = Sql.Database("75u33zhx4yxezmshig2uxisjby-tvg7dn3nimwenndimwrqen6tf4.datawarehouse.fabric.microsoft.com", "DW_TEACHER_SALARIES"),
+					    dbo_Dim_Salary_Stage = Origem{[Schema="dbo",Item="Dim_Salary_Stage"]}[Data]
+					in
+					    dbo_Dim_Salary_Stage
+
+		annotation PBI_NavigationStepName = Navegação
+
+		annotation PBI_ResultType = Table
+
+	table Dim_School_Size
+		lineageTag: bf08f1f7-9b86-4a81-bff3-be25288e6d50
+
+		column Sk_School_Size
+			dataType: int64
+			formatString: 0
+			lineageTag: c92a9e65-9d86-4f3f-b70c-e023428c3d00
+			summarizeBy: none
+			sourceColumn: Sk_School_Size
+
+			annotation SummarizationSetBy = Automatic
+
+		column School_Size_Long
+			dataType: string
+			lineageTag: fb8fad1a-bf5c-4831-b248-b4d7d0188da7
+			summarizeBy: none
+			sourceColumn: School_Size_Long
+			sortByColumn: School_Size_Order
+
+			changedProperty = SortByColumn
+
+			annotation SummarizationSetBy = Automatic
+
+		column School_Size_Short
+			dataType: string
+			lineageTag: 2bebaec6-86ac-4637-9251-987fbf8e684e
+			summarizeBy: none
+			sourceColumn: School_Size_Short
+			sortByColumn: School_Size_Order
+
+			changedProperty = SortByColumn
+
+			annotation SummarizationSetBy = Automatic
+
+		column School_Size_Order
+			dataType: int64
+			formatString: 0
+			lineageTag: b980686e-16eb-411b-89df-62d6c44389b6
+			summarizeBy: none
+			sourceColumn: School_Size_Order
+
+			annotation SummarizationSetBy = Automatic
+
+		partition Dim_School_Size = m
+			mode: import
+			source =
+					let
+					    Origem = Sql.Database("75u33zhx4yxezmshig2uxisjby-tvg7dn3nimwenndimwrqen6tf4.datawarehouse.fabric.microsoft.com", "DW_TEACHER_SALARIES"),
+					    dbo_Dim_School_Size = Origem{[Schema="dbo",Item="Dim_School_Size"]}[Data]
+					in
+					    dbo_Dim_School_Size
+
+		annotation PBI_NavigationStepName = Navegação
+
+		annotation PBI_ResultType = Table
+
+	table Dim_Year
+		lineageTag: 67af2d29-1d28-4521-8310-891ba41edd25
+
+		measure 'Earliest Year' = MIN(Dim_Year[Year])
+			formatString: 0
+			lineageTag: a6236be8-5547-4f8f-bea9-9004ae28d747
+
+		measure 'Latest Year' = MAX(Dim_Year[Year])
+			formatString: 0
+			lineageTag: 75da802a-59b0-4584-83ab-69da3b9e1355
+
+		column Sk_Year
+			dataType: int64
+			formatString: 0
+			lineageTag: e12be56c-3ea6-44c9-aef9-87ef080094ad
+			summarizeBy: none
+			sourceColumn: Sk_Year
+
+			annotation SummarizationSetBy = Automatic
+
+		column Year
+			dataType: int64
+			formatString: 0
+			lineageTag: daa4d633-13a7-4cab-84cd-1b4023c649ea
+			summarizeBy: sum
+			sourceColumn: Year
+
+			annotation SummarizationSetBy = Automatic
+
+		partition Dim_Year = m
+			mode: import
+			source =
+					let
+					    Origem = Sql.Database("75u33zhx4yxezmshig2uxisjby-tvg7dn3nimwenndimwrqen6tf4.datawarehouse.fabric.microsoft.com", "DW_TEACHER_SALARIES"),
+					    dbo_Dim_Year = Origem{[Schema="dbo",Item="Dim_Year"]}[Data]
+					in
+					    dbo_Dim_Year
+
+		annotation PBI_NavigationStepName = Navegação
+
+		annotation PBI_ResultType = Table
+
+	table Fact_Macro
+		lineageTag: d4fe7d1b-91ac-4f75-ac99-bb9fc0bdbbeb
+
+		measure 'Average National Wage' =
+				
+				CALCULATE (
+				    AVERAGE ( Fact_Macro[Measure_Value] ),
+				    Dim_Indicator[Indicator] = "Average Annual Wages"
+				)
+			formatString: #,0.00
+			lineageTag: 30da2d1c-e357-409c-8d43-cfc0606e1270
+
+		measure 'Change in Relative Position (pp)' =
+				
+				VAR EarliestYear =
+				    CALCULATE(MIN(Dim_Year[Year]), ALL(Dim_Year))
+				VAR LatestYear =
+				    CALCULATE(MAX(Dim_Year[Year]), ALL(Dim_Year))
+				
+				VAR RatioLatest =
+				    CALCULATE(
+				        [Teacher to Avg Wage Ratio (%)],
+				        Dim_Year[Year] = LatestYear
+				    )
+				
+				VAR RatioBase =
+				    CALCULATE(
+				        [Teacher to Avg Wage Ratio (%)],
+				        Dim_Year[Year] = EarliestYear
+				    )
+				
+				RETURN
+				(RatioLatest - RatioBase) * 100
+			formatString: #,0.00
+			lineageTag: c2c62405-a859-4062-8279-78d670f06737
+
+		measure 'CPI Index' = CALCULATE(AVERAGE(Fact_Macro[Measure_Value]),Dim_Indicator[Indicator] = "Consumer Price Index (CPI)")
+			formatString: #,0.00
+			lineageTag: b775b0e8-1334-4dfb-aa3d-f4d5ee8e59c2
+
+		measure 'CPI YoY (%)' = ```
+				
+				VAR Prev =
+				    CALCULATE(
+				        [CPI Index],
+				        FILTER(
+				            ALL(Dim_Year),
+				            Dim_Year[Year] = MAX(Dim_Year[Year]) - 1
+				        )
+				    )
+				RETURN
+				DIVIDE([CPI Index] - Prev, Prev)
+				
+				```
+			formatString: #,0.00%;-#,0.00%;#,0.00%
+			lineageTag: 4566aac1-c2ad-44b1-86d8-f8888710ef42
+
+		measure 'Cumulative Inflation %' =
+				
+				VAR BaseYearCPI =
+				    CALCULATE(
+				        [CPI Index],
+				        FILTER(ALL(Dim_Year), Dim_Year[Year] = MIN(Dim_Year[Year]))
+				    )
+				VAR LastYear =
+				    CALCULATE(MAX(Dim_Year[Year]), ALL(Dim_Year))
+				VAR LastCPI =
+				    CALCULATE([CPI Index], Dim_Year[Year] = LastYear)
+				RETURN
+				DIVIDE(LastCPI - BaseYearCPI, BaseYearCPI)
+			formatString: #,0.00%;-#,0.00%;#,0.00%
+			lineageTag: 10acc261-d7f2-4ef1-94fa-12cad4c48fa6
+
+		measure 'Cumulative Real Salary Change %' =
+				
+				VAR FirstYear =
+				    CALCULATE(MIN(Dim_Year[Year]), ALL(Dim_Year))
+				VAR LastYear =
+				    CALCULATE(MAX(Dim_Year[Year]), ALL(Dim_Year))
+				VAR FirstValue =
+				    CALCULATE(
+				        [Real Salary (CPI Adjusted)],
+				        FILTER(ALL(Dim_Year), Dim_Year[Year] = FirstYear)
+				    )
+				VAR LastValue =
+				    CALCULATE(
+				        [Real Salary (CPI Adjusted)],
+				        FILTER(ALL(Dim_Year), Dim_Year[Year] = LastYear)
+				    )
+				RETURN
+				DIVIDE(LastValue - FirstValue, FirstValue)
+			formatString: #,0.00%;-#,0.00%;#,0.00%
+			lineageTag: 6a3c37f5-4b16-4d06-91f0-05740080832d
+
+		measure 'Education Expenditure (% GDP)' = CALCULATE(AVERAGE(Fact_Macro[Measure_Value]),Dim_Indicator[Indicator]="Education Expenditure")/100
+			formatString: 0.00%;-0.00%;0.00%
+			lineageTag: a0175e4d-070a-4c1e-be04-a6551691b1db
+
+		measure 'GDP YoY Growth (%)' =
+				
+				VAR CurrYear = MAX ( Dim_Year[Year] )
+				VAR CurrGDP =
+				    CALCULATE (
+				        AVERAGE ( Fact_Macro[Measure_Value] ),
+				        Dim_Indicator[Indicator] = "Gross Domestic Product (GDP) per Capita"
+				    )
+				VAR PrevGDP =
+				    CALCULATE (
+				        AVERAGE ( Fact_Macro[Measure_Value] ),
+				        Dim_Indicator[Indicator] = "Gross Domestic Product (GDP) per Capita",
+				        FILTER (
+				            ALL ( Dim_Year ),
+				            Dim_Year[Year] = CurrYear - 1
+				        )
+				    )
+				RETURN
+				DIVIDE ( CurrGDP - PrevGDP, PrevGDP )
+			formatString: #,0.00%;-#,0.00%;#,0.00%
+			lineageTag: 0f96e7e8-31a8-40e2-9b26-0f7b63ca9207
+
+		measure 'Salary vs National Wage Cumulative Gap (pp)' =
+				
+				VAR Y0 = CALCULATE(MIN(Dim_Year[Year]), ALL(Dim_Year))
+				VAR YT = CALCULATE(MAX(Dim_Year[Year]), ALL(Dim_Year))
+				
+				VAR Salary0 = CALCULATE([Nominal Salary (EUR)], Dim_Year[Year] = Y0)
+				VAR SalaryT = CALCULATE([Nominal Salary (EUR)], Dim_Year[Year] = YT)
+				
+				VAR Wage0 = CALCULATE([Average National Wage], Dim_Year[Year] = Y0)
+				VAR WageT = CALCULATE([Average National Wage], Dim_Year[Year] = YT)
+				
+				VAR SalaryCum = DIVIDE(SalaryT - Salary0, Salary0)
+				VAR WageCum   = DIVIDE(WageT - Wage0, Wage0)
+				
+				RETURN (SalaryCum - WageCum) * 100
+			formatString: #,0.00
+			lineageTag: ec10b96c-6514-405e-b4d9-9669c2b41e45
+
+		measure 'House Price Index' =
+				
+				CALCULATE (
+				    AVERAGE ( Fact_Macro[Measure_Value] ),
+				    Dim_Indicator[Indicator] = "House Price Index (2015=100)"
+				)
+			formatString: #,0.00
+			lineageTag: bf62a41b-7fa1-487a-ab5a-92fb54e06dae
+
+		measure 'HPI (Base 2021)' = ```
+				
+				VAR Base =
+				    CALCULATE(
+				        [House Price Index],
+				        ALL(Dim_Year),
+				        Dim_Year[Year] = 2021
+				    )
+				RETURN
+				DIVIDE([House Price Index], Base) * 100
+				
+				```
+			formatString: #,0.00
+			lineageTag: 6565ef9b-31bf-4aea-87e8-806fdd7a6ee7
+
+		measure 'Latest National Average Wage' = CALCULATE([Average National Wage], Dim_Year[Year] = MAX(Dim_Year[Year]))
+			formatString: #,0.00
+			lineageTag: 00575cbe-2ea4-4e39-905a-5ff1156abd85
+
+		measure 'Latest Real Salary' = CALCULATE([Real Salary (CPI Adjusted)], Dim_Year[Year] = MAX(Dim_Year[Year]))
+			formatString: #,0.00
+			lineageTag: d9c73cf7-6104-4afd-8898-9ae4da25d1af
+
+		measure 'Latest Teacher vs National Wage Ratio (%)' =
+				
+				VAR LatestYear = MAX(Dim_Year[Year])
+				RETURN
+				CALCULATE(
+				    [Teacher to Avg Wage Ratio (%)],
+				    Dim_Year[Year] = LatestYear
+				)
+			formatString: #,0.00%;-#,0.00%;#,0.00%
+			lineageTag: ffc50a38-604b-4c70-a31a-5558e13d5c0f
+
+		measure 'Latest Wage Gap' =
+				
+				[Nominal Salary (EUR)] - [Average National Wage]
+			formatString: #,0.00
+			lineageTag: 9f61d4f2-a818-495e-9109-a33a06dcfa81
+
+		measure 'Median Earnings' =
+				
+				CALCULATE (
+				    AVERAGE ( Fact_Macro[Measure_Value] ),
+				    Dim_Indicator[Indicator] = "Median Annual Earnings"
+				)
+			formatString: #,0.00
+			lineageTag: 43e5bc8f-95eb-43f0-a1a7-b83107b195cc
+
+		measure 'National Wage vs GDP Cumulative Gap (pp)' =
+				
+				VAR Y0 = CALCULATE(MIN(Dim_Year[Year]), ALL(Dim_Year))
+				VAR YT = CALCULATE(MAX(Dim_Year[Year]), ALL(Dim_Year))
+				
+				VAR Wage0 = CALCULATE([Average National Wage], Dim_Year[Year] = Y0)
+				VAR WageT = CALCULATE([Average National Wage], Dim_Year[Year] = YT)
+				VAR WageCum = DIVIDE(WageT - Wage0, Wage0)
+				
+				VAR GDP0 =
+				    CALCULATE(
+				        AVERAGE(Fact_Macro[Measure_Value]),
+				        Dim_Indicator[Indicator] = "Gross Domestic Product (GDP) per Capita",
+				        Dim_Year[Year] = Y0
+				    )
+				VAR GDPT =
+				    CALCULATE(
+				        AVERAGE(Fact_Macro[Measure_Value]),
+				        Dim_Indicator[Indicator] = "Gross Domestic Product (GDP) per Capita",
+				        Dim_Year[Year] = YT
+				    )
+				VAR GDPCum = DIVIDE(GDPT - GDP0, GDP0)
+				
+				RETURN (WageCum - GDPCum) * 100
+			formatString: #,0.00
+			lineageTag: e1e0151e-9c34-4ac7-b2e5-23a4c27b827d
+
+		measure 'National Wage YoY Growth (%)' =
+				
+				VAR CurrYear = MAX ( Dim_Year[Year] )
+				VAR CurrValue =
+				    [Average National Wage]
+				VAR PrevValue =
+				    CALCULATE (
+				        [Average National Wage],
+				        FILTER (
+				            ALL ( Dim_Year ),
+				            Dim_Year[Year] = CurrYear - 1
+				        )
+				    )
+				RETURN
+				DIVIDE ( CurrValue - PrevValue, PrevValue )
+			formatString: #,0.00%;-#,0.00%;#,0.00%
+			lineageTag: 8c321832-6843-42cc-bfd5-d7199bf95c94
+
+		measure 'Nominal Salary YoY (%)' =
+				
+				VAR CurrentYear = SELECTEDVALUE(Dim_Year[Year])
+				VAR PrevYear = CurrentYear - 1
+				VAR PrevValue =
+				    CALCULATE ([Nominal Salary (EUR)],Dim_Year[Year]=PrevYear)
+				RETURN
+				IF (
+				    NOT ISBLANK (PrevValue),
+				    DIVIDE ([Nominal Salary (EUR)] - PrevValue, PrevValue )
+				)
+			formatString: #,0.00%;-#,0.00%;#,0.00%
+			lineageTag: b277a973-276a-459a-804a-276b02c5c4f5
+
+		measure 'Nominal vs CPI Growth Gap %' =
+				
+				([Nominal Salary YoY (%)] - [CPI YoY (%)])*100
+			formatString: #,0.00
+			lineageTag: fd0c015b-916c-41e8-951c-904aba43210a
+
+		measure 'PPP Index' =
+				CALCULATE (
+				    AVERAGE ( Fact_Macro[Measure_Value] ),
+				    Dim_Indicator[Indicator] = "Purchasing Power Parity (PPP)"
+				)
+			formatString: #,0.00
+			lineageTag: eedbc520-0fe8-4385-ad9e-a96bbc2a5f96
+
+		measure 'Purchasing Power Gap' = [Nominal Salary (EUR)] - [Real Salary (CPI Adjusted)]
+			formatString: #,0.00
+			lineageTag: ca444293-3985-4c5c-9aba-f1d5efb9768d
+
+		measure 'Real Salary (CPI Adjusted)' = DIVIDE([Nominal Salary (EUR)],[CPI Index]/100)
+			formatString: #,0.00
+			lineageTag: 076caceb-a653-4824-afaa-84e20e4528db
+
+		measure 'Real Salary Role Gap' =
+				
+				[School Head Real Salary] - [Teacher Real Salary]
+			formatString: #,0
+			lineageTag: 62888512-02cf-470b-b6a1-b051674ecd12
+
+			annotation PBI_FormatHint = {"isDecimal":true}
+
+		measure 'Real Salary Role Gap %' =
+				
+				DIVIDE(
+				    [School Head Real Salary] - [Teacher Real Salary],
+				    [Teacher Real Salary]
+				)
+			formatString: #,0.00%;-#,0.00%;#,0.00%
+			lineageTag: c6c91816-7e56-4790-9eb8-b8b3670602ca
+
+		measure 'Real Salary vs 2021 %' = ```
+				
+				VAR BaseYearValue =
+				    CALCULATE(
+				        [Real Salary (CPI Adjusted)],
+				        FILTER(ALL(Dim_Year), Dim_Year[Year] = 2021)
+				    )
+				RETURN
+				DIVIDE([Real Salary (CPI Adjusted)] - BaseYearValue, BaseYearValue)
+				
+				```
+			formatString: #,0.00%;-#,0.00%;#,0.00%
+			lineageTag: fc8825b0-7300-4eb5-9f68-8421aeb50d77
+
+		measure 'Real Salary YoY (%)' = ```
+				
+				VAR CurrentYear = SELECTEDVALUE ( Dim_Year[Year] )
+				VAR PrevYear = CurrentYear - 1
+				VAR PrevValue =
+				    CALCULATE ( [Real Salary (CPI Adjusted)], Dim_Year[Year] = PrevYear )
+				RETURN
+				IF (
+				    NOT ISBLANK ( PrevValue ),
+				    DIVIDE ( [Real Salary (CPI Adjusted)] - PrevValue, PrevValue )
+				)
+				
+				```
+			formatString: #,0.00%;-#,0.00%;#,0.00%
+			lineageTag: 43e49eef-9a97-40b3-b0eb-b2fa46e7c2ee
+
+		measure 'Reference Line (100%)' = 1
+			formatString: #,0.00%;-#,0.00%;#,0.00%
+			lineageTag: ce257cf5-c251-4a0e-b9ad-73218663ff7c
+
+		measure 'Salary (PPS)' =
+				
+				VAR CurrentRole = SELECTEDVALUE(Dim_Role[Role])
+				
+				RETURN
+				DIVIDE([Nominal Salary (NCU)],
+				    [PPP Index]
+				)
+			formatString: #,0.00
+			lineageTag: c421f9c2-f03c-4445-9bce-d3546ee617ed
+
+		measure 'School Head Real Salary' =
+				
+				CALCULATE(
+				    [Real Salary (CPI Adjusted)],
+				    Dim_Role[Role] = "School Head"
+				)
+			formatString: #,0.00
+			lineageTag: 655bbb70-ee27-4972-9a22-d1a420194d75
+
+		measure 'Teacher Real Salary' =
+				
+				CALCULATE(
+				    [Real Salary (CPI Adjusted)],
+				    Dim_Role[Role] = "Teacher"
+				)
+			formatString: #,0.00
+			lineageTag: 9085dba4-203b-41d4-8f61-82771d68af3b
+
+		measure 'Teacher to Avg Wage Ratio (%)' =
+				
+				DIVIDE (
+				    [Nominal Salary (EUR)],
+				    [Average National Wage]
+				)
+			formatString: 0.00%;-0.00%;0.00%
+			lineageTag: 0793d51c-c6a8-43b7-87fe-71ca05bc9b5b
+
+		measure 'Teacher vs National %' =
+				
+				DIVIDE([Latest Nominal Salary], [Latest National Average Wage])
+			formatString: #,0.00%;-#,0.00%;#,0.00%
+			lineageTag: fe77dd11-66f3-4ac7-ab5d-563d994cbfd6
+
+		measure 'European Median Salary (PPS)' =
+				
+				MEDIANX(
+				    FILTER(
+				        ALL(Dim_Country),
+				        NOT ISBLANK([Salary (PPS)])
+				    ),
+				    [Salary (PPS)]
+				)
+			formatString: #,0.000
+			lineageTag: bec28205-b084-4e65-beb2-7ec628c1b565
+
+		measure 'Reference Line (0%)' = 0
+			formatString: 0%;-0%;0%
+			lineageTag: 739f63d7-0d3f-4dcd-8610-c565e54f4d3d
+
+		measure 'Cumulative Nominal Salary Change %' =
+				
+				VAR FirstYear =
+				    CALCULATE(MIN(Dim_Year[Year]), ALL(Dim_Year))
+				VAR LastYear =
+				    CALCULATE(MAX(Dim_Year[Year]), ALL(Dim_Year))
+				VAR FirstValue =
+				    CALCULATE(
+				        [Nominal Salary (EUR)],
+				        FILTER(ALL(Dim_Year), Dim_Year[Year] = FirstYear)
+				    )
+				VAR LastValue =
+				    CALCULATE(
+				        [Nominal Salary (EUR)],
+				        FILTER(ALL(Dim_Year), Dim_Year[Year] = LastYear)
+				    )
+				RETURN
+				DIVIDE(LastValue - FirstValue, FirstValue)
+			formatString: 0.00%;-0.00%;0.00%
+			lineageTag: cf7d2337-ae52-40dc-b166-d86b8bf3b641
+
+		measure 'Salary PT (PPS)' =
+				
+				CALCULATE(
+				    [Salary (PPS)],
+				    Dim_Country[Country_Code] = "PT"
+				)
+			lineageTag: fd2eb9a4-6738-475d-9323-e4e9a2b9a159
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'Salary Growth vs Inflation Gap (pp)' = ([Cumulative Nominal Salary Change %] - [Cumulative Inflation %])*100
+			formatString: 0.00
+			lineageTag: bf6f5c23-d8a7-4d88-8f4b-e3f505491131
+
+		measure 'Government Expenditure (% GDP)' =
+				
+				CALCULATE (
+				    AVERAGE ( Fact_Macro[Measure_Value] ),
+				    Dim_Indicator[Indicator] = "Government Expenditure"
+				)/100
+			formatString: 0.00%;-0.00%;0.00%
+			lineageTag: e783de3d-9236-4ea0-9c87-f1853bad11cf
+
+		measure GDP =
+				CALCULATE(AVERAGE(Fact_Macro[Measure_Value]),
+				        Dim_Indicator[Indicator] = "Gross Domestic Product (GDP) per Capita")
+			lineageTag: 272ea363-7576-49fb-a7c7-60bfe22a329b
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'Education Expenditure Index (Base 2021)' =
+				
+				VAR BaseYear =
+				    CALCULATE(
+				        [Education Expenditure (% GDP)],
+				        ALL(Dim_Year),
+				        Dim_Year[Year] = 2021
+				    )
+				RETURN
+				    DIVIDE([Education Expenditure (% GDP)], BaseYear, 0) * 100
+			formatString: 0.00
+			lineageTag: 7d80e640-b9e8-4d4f-aa1c-c75a230efaa2
+
+		measure 'Education Expenditure Change (pp)' =
+				
+				([Education Expenditure (% GDP)] -
+				    CALCULATE(
+				        [Education Expenditure (% GDP)],
+				        ALL(Dim_Year),
+				        Dim_Year[Year] = 2021
+				    )
+				) * 100
+			lineageTag: 3688e5c8-7779-4c75-ae12-d83da9b2969b
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'Salary vs GDP Cumulative Gap (pp)' =
+				
+				VAR Y0 = CALCULATE(MIN(Dim_Year[Year]), ALL(Dim_Year))
+				VAR YT = CALCULATE(MAX(Dim_Year[Year]), ALL(Dim_Year))
+				
+				-- Salary
+				VAR Salary0 = CALCULATE([Nominal Salary (EUR)], Dim_Year[Year] = Y0)
+				VAR SalaryT = CALCULATE([Nominal Salary (EUR)], Dim_Year[Year] = YT)
+				VAR SalaryCum = DIVIDE(SalaryT - Salary0, Salary0)
+				
+				-- GDP per Capita
+				VAR GDP0 =
+				    CALCULATE(
+				        AVERAGE(Fact_Macro[Measure_Value]),
+				        Dim_Indicator[Indicator] = "Gross Domestic Product (GDP) per Capita",
+				        Dim_Year[Year] = Y0
+				    )
+				
+				VAR GDPT =
+				    CALCULATE(
+				        AVERAGE(Fact_Macro[Measure_Value]),
+				        Dim_Indicator[Indicator] = "Gross Domestic Product (GDP) per Capita",
+				        Dim_Year[Year] = YT
+				    )
+				
+				VAR GDPCum = DIVIDE(GDPT - GDP0, GDP0)
+				
+				RETURN (SalaryCum - GDPCum) * 100
+			lineageTag: 90c71250-2afc-4d43-836d-5ea3230f2059
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column Fk_Year
+			dataType: int64
+			formatString: 0
+			lineageTag: 3d51dd0a-6ac1-4e26-85b1-5503a8dfbd82
+			summarizeBy: none
+			sourceColumn: Fk_Year
+
+			annotation SummarizationSetBy = Automatic
+
+		column Fk_Indicator
+			dataType: int64
+			formatString: 0
+			lineageTag: 153e8134-f9e0-4c3f-96db-14ec22bb84e0
+			summarizeBy: none
+			sourceColumn: Fk_Indicator
+
+			annotation SummarizationSetBy = Automatic
+
+		column Fk_Country
+			dataType: int64
+			formatString: 0
+			lineageTag: efedcaee-12a4-4e7e-a3a2-3fe894bfb4c7
+			summarizeBy: none
+			sourceColumn: Fk_Country
+
+			annotation SummarizationSetBy = Automatic
+
+		column Measure_Value
+			dataType: double
+			lineageTag: b9c5e9cf-18a2-43cf-bcc7-67f03523131b
+			summarizeBy: sum
+			sourceColumn: Measure_Value
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		partition Fact_Macro = m
+			mode: import
+			source =
+					let
+					    Origem = Sql.Database("75u33zhx4yxezmshig2uxisjby-tvg7dn3nimwenndimwrqen6tf4.datawarehouse.fabric.microsoft.com", "DW_TEACHER_SALARIES"),
+					    dbo_Fact_Macro = Origem{[Schema="dbo",Item="Fact_Macro"]}[Data]
+					in
+					    dbo_Fact_Macro
+
+		annotation PBI_NavigationStepName = Navegação
+
+		annotation PBI_ResultType = Table
+
+	table Fact_Salary
+		lineageTag: 0f2f5a90-62eb-4ead-a5fd-f201bf4b6827
+
+		measure 'Average School Head Salary' =
+				
+				CALCULATE(
+				    AVERAGE(Fact_Salary[Measure_Salary_EUR]),
+				    Dim_Role[Role] = "School Head"
+				)
+			formatString: #,0
+			lineageTag: 5d45719d-f93b-4e41-9f7d-0de53a26e6f8
+
+			changedProperty = IsHidden
+
+			annotation PBI_FormatHint = {"isDecimal":true}
+
+		measure 'Average Teacher Salary' =
+				
+				CALCULATE(
+				    AVERAGE(Fact_Salary[Measure_Salary_EUR]),
+				    Dim_Role[Role] = "Teacher"
+				)
+			formatString: #,0
+			lineageTag: 10ab97cd-b875-4d91-a022-caa9c8177bb6
+
+			changedProperty = IsHidden
+
+			annotation PBI_FormatHint = {"isDecimal":true}
+
+		measure 'Highest Paying Country Label' = ```
+				
+				VAR CountriesWithSalary =
+				    FILTER(
+				        ALL(Dim_Country),
+				        NOT ISBLANK([Salary (PPS)]) && [Salary (PPS)] > 0
+				    )
+				VAR TopCountry =
+				    TOPN(
+				        1,
+				        CountriesWithSalary,
+				        [Salary (PPS)],
+				        DESC
+				    )
+				VAR CountryName =
+				    MAXX(TopCountry, Dim_Country[Country_Name_Clean])
+				VAR SalaryValue =
+				    MAXX(TopCountry, [Salary (PPS)])
+				RETURN
+				CountryName
+				
+				```
+			lineageTag: 8bd258dd-70e7-4887-abcd-8de3465d6376
+
+			changedProperty = IsHidden
+
+		measure 'Latest Nominal Salary' = CALCULATE([Nominal Salary (EUR)], Dim_Year[Year] = MAX(Dim_Year[Year]))
+			formatString: #,0.00
+			lineageTag: 17ed636d-9b57-4107-8caa-7fced171ea4b
+
+			changedProperty = IsHidden
+
+		measure 'Lowest Paying Country (PPS)' = ```
+				
+				VAR CountriesWithSalary =
+				    FILTER(
+				        ALL(Dim_Country),
+				        NOT ISBLANK([Salary (PPS)]) && [Salary (PPS)] > 0
+				    )
+				VAR BottomCountry =
+				    TOPN(
+				        1,
+				        CountriesWithSalary,
+				        [Salary (PPS)],
+				        ASC
+				    )
+				VAR CountryName =
+				    MAXX(BottomCountry, Dim_Country[Country_Name_Clean])
+				VAR SalaryValue =
+				    MAXX(BottomCountry, [Salary (PPS)])
+				RETURN
+				CountryName
+				
+				```
+			lineageTag: d353d923-9537-486d-a775-dae902821751
+
+			changedProperty = IsHidden
+
+		measure 'Nominal Salary (EUR)' = AVERAGE(Fact_Salary[Measure_Salary_EUR])
+			formatString: #,0.00
+			lineageTag: 35e4648a-ccc5-48df-b445-8c4c449abc82
+
+			changedProperty = IsHidden
+
+		measure 'Nominal Salary (NCU)' = AVERAGE(Fact_Salary[Measure_Salary_NCU])
+			formatString: #,0.00
+			lineageTag: ee8d055d-2e5d-4bbd-958b-ac6386fe319c
+
+			changedProperty = IsHidden
+
+		measure 'Nominal Salary Role Gap' = [Average School Head Salary] - [Average Teacher Salary]
+			formatString: #,0
+			lineageTag: 07e5bab6-f17a-4f15-839d-2a40e6ef25ed
+
+			changedProperty = IsHidden
+
+			annotation PBI_FormatHint = {"isDecimal":true}
+
+		measure 'Nominal Salary Role Gap %' =
+				
+				DIVIDE(
+				    [Average School Head Salary] - [Average Teacher Salary],
+				    [Average Teacher Salary]
+				)
+			formatString: #,0%;-#,0%;#,0%
+			lineageTag: 1b935eb4-5591-4de0-9de0-68d269293938
+
+			changedProperty = IsHidden
+
+		measure 'Nominal Salary YoY Growth (%)' =
+				
+				VAR CurrYear = MAX ( Dim_Year[Year] )
+				VAR CurrValue =
+				    [Nominal Salary (EUR)]
+				VAR PrevValue =
+				    CALCULATE (
+				        [Nominal Salary (EUR)],
+				        FILTER (
+				            ALL ( Dim_Year ),
+				            Dim_Year[Year] = CurrYear - 1
+				        )
+				    )
+				RETURN
+				DIVIDE ( CurrValue - PrevValue, PrevValue )
+			formatString: #,0.00%;-#,0.00%;#,0.00%
+			lineageTag: e5e0f9d7-bff1-469b-bd0f-bf66525c58ae
+
+			changedProperty = IsHidden
+
+		measure 'Ranking PT Position' =
+				
+				VAR CountriesWithData =
+				    FILTER(
+				        ALL(Dim_Country),
+				        NOT ISBLANK([Salary (PPS)]) &&
+				        [Salary (PPS)] > 0
+				    )
+				
+				VAR RankPT =
+				    CALCULATE(
+				        RANKX(
+				            CountriesWithData,
+				            [Salary (PPS)],
+				            ,
+				            DESC,
+				            DENSE
+				        ),
+				        Dim_Country[Country_Code] = "PT"
+				    )
+				
+				VAR LastTwoDigits = MOD(RankPT, 100)
+				VAR LastDigit = MOD(RankPT, 10)
+				
+				VAR Suffix =
+				    SWITCH(
+				        TRUE(),
+				        LastTwoDigits IN {11, 12, 13}, "th",
+				        LastDigit = 1, "st",
+				        LastDigit = 2, "nd",
+				        LastDigit = 3, "rd",
+				        "th"
+				    )
+				
+				RETURN
+				RankPT & Suffix
+			lineageTag: 3d0fe810-c671-46cd-9000-8493e1cc2ed7
+
+			changedProperty = IsHidden
+
+		measure 'School Head Compression Ratio' =
+				
+				VAR TopSalary =
+				    CALCULATE(
+				        AVERAGE(Fact_Salary[Measure_Salary_EUR]),
+				        Dim_Role[Role] = "School Head",
+				        REMOVEFILTERS(Dim_Salary_Stage),
+				        Dim_Salary_Stage[Salary_Stage] = "Maximum"
+				    )
+				VAR StartSalary =
+				    CALCULATE(
+				        AVERAGE(Fact_Salary[Measure_Salary_EUR]),
+				        Dim_Role[Role] = "School Head",
+				        REMOVEFILTERS(Dim_Salary_Stage),
+				        Dim_Salary_Stage[Salary_Stage] = "Minimum"
+				    )
+				RETURN
+				DIVIDE(TopSalary, StartSalary)
+			formatString: #,0.00
+			lineageTag: bc495246-fc50-475e-8a31-217730c8c47e
+
+			changedProperty = IsHidden
+
+		measure 'Teacher Compression Ratio' =
+				
+				VAR TopSalary =
+				    CALCULATE(
+				        AVERAGE(Fact_Salary[Measure_Salary_EUR]),
+				        Dim_Role[Role] = "Teacher",
+				        REMOVEFILTERS(Dim_Salary_Stage),
+				        Dim_Salary_Stage[Salary_Stage] = "At the top of the range"
+				    )
+				VAR StartSalary =
+				    CALCULATE(
+				        AVERAGE(Fact_Salary[Measure_Salary_EUR]),
+				        Dim_Role[Role] = "Teacher",
+				        REMOVEFILTERS(Dim_Salary_Stage),
+				        Dim_Salary_Stage[Salary_Stage] = "Starting salary"
+				    )
+				RETURN
+				DIVIDE(TopSalary, StartSalary)
+			formatString: #,0.00
+			lineageTag: 540b2db0-9ff5-4b2c-89f2-0130a09bcd40
+
+			changedProperty = IsHidden
+
+		measure 'Teacher Salary Index (Base 2021)' = ```
+				
+				VAR BaseSalary =
+				    CALCULATE (
+				        [Nominal Salary (EUR)],
+				        FILTER ( ALL ( Dim_Year[Year] ), Dim_Year[Year] = 2021 )
+				    )
+				RETURN
+				    DIVIDE ( [Nominal Salary (EUR)], BaseSalary ) * 100
+				
+				```
+			formatString: #,0.00
+			lineageTag: c77c2a60-8f56-410e-b5bc-be965421aa9e
+
+			changedProperty = IsHidden
+
+		measure 'Salary Lowest Paying Country (PPS)' =
+				
+				CALCULATE(
+				    [Salary (PPS)],
+				    FILTER(
+				        ALL(Dim_Country),
+				        Dim_Country[Country_Name] = [Lowest Paying Country (PPS)]
+				    )
+				)
+			lineageTag: 6e21b453-6d97-4744-89a4-be2f35f55190
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'Salary Highest Paying Country (PPS)' =
+				
+				CALCULATE(
+				    [Salary (PPS)],
+				    FILTER(
+				        ALL(Dim_Country),
+				        Dim_Country[Country_Name_Clean] = [Highest Paying Country Label]
+				    )
+				)
+			lineageTag: 5cc3b136-abf4-4fab-affb-34e9a16741f2
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'Nominal Salary Index (Base 2021)' =
+				
+				VAR BaseYear =
+				    CALCULATE(
+				        [Nominal Salary (EUR)],
+				        ALL(Dim_Year),
+				        Dim_Year[Year] = 2021
+				    )
+				RETURN
+				    DIVIDE([Nominal Salary (EUR)], BaseYear, 0) * 100
+			formatString: 0.00
+			lineageTag: e6914b3d-0c01-47f2-960e-91ddfcc5e195
+
+		column Fk_Year
+			dataType: int64
+			formatString: 0
+			lineageTag: 7e95e2e8-ff7c-4fe5-bfc5-be519c037a9b
+			summarizeBy: none
+			sourceColumn: Fk_Year
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column Fk_Role
+			dataType: int64
+			formatString: 0
+			lineageTag: 57aa629d-192d-45fd-b9a4-af13eb6cc2ed
+			summarizeBy: none
+			sourceColumn: Fk_Role
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column Fk_Isced
+			dataType: int64
+			formatString: 0
+			lineageTag: f49532a7-1aaf-4976-804f-8fbaa9bcf0f8
+			summarizeBy: none
+			sourceColumn: Fk_Isced
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column Fk_Salary_Stage
+			dataType: int64
+			formatString: 0
+			lineageTag: 62703cad-1c28-4df7-9313-84e3bc2df113
+			summarizeBy: none
+			sourceColumn: Fk_Salary_Stage
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column Fk_Country
+			dataType: int64
+			formatString: 0
+			lineageTag: a7390ef4-beab-4e1a-84db-c67ad2cbb747
+			summarizeBy: none
+			sourceColumn: Fk_Country
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column Fk_Currency
+			dataType: int64
+			formatString: 0
+			lineageTag: 4c44b05c-9404-4a40-bb18-448eb9af3d22
+			summarizeBy: none
+			sourceColumn: Fk_Currency
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column Fk_Qualification
+			dataType: int64
+			formatString: 0
+			lineageTag: 8229074a-3972-4f5a-997c-b964d97861a1
+			summarizeBy: none
+			sourceColumn: Fk_Qualification
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column Fk_School_Size
+			dataType: int64
+			formatString: 0
+			lineageTag: 93ed5189-b7ff-4b07-a231-0024a8266bc7
+			summarizeBy: none
+			sourceColumn: Fk_School_Size
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column Measure_Salary_NCU
+			dataType: double
+			formatString: 0.00
+			lineageTag: 2df00387-02c3-41ac-ac70-6ac9929563cb
+			summarizeBy: sum
+			sourceColumn: Measure_Salary_NCU
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column Fx_Rate_NCU_per_EUR
+			dataType: double
+			lineageTag: f95d4e8e-bb73-466c-aa33-fd0ebb447dd5
+			summarizeBy: sum
+			sourceColumn: Fx_Rate_NCU_per_EUR
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column Measure_Salary_EUR
+			dataType: double
+			formatString: 0.00
+			lineageTag: e6273cfe-cca9-4505-880f-73d514cabcc7
+			summarizeBy: sum
+			sourceColumn: Measure_Salary_EUR
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column Currency = RELATED(Dim_Currency[Currency_Display])
+			lineageTag: 2df40662-8e52-4f47-89ea-e591e806ba19
+			summarizeBy: none
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		partition Fact_Salary = m
+			mode: import
+			source =
+					let
+					    Origem = Sql.Database("75u33zhx4yxezmshig2uxisjby-tvg7dn3nimwenndimwrqen6tf4.datawarehouse.fabric.microsoft.com", "DW_TEACHER_SALARIES"),
+					    dbo_Fact_Salary = Origem{[Schema="dbo",Item="Fact_Salary"]}[Data],
+					    #"Linhas Filtradas" = Table.SelectRows(dbo_Fact_Salary, each ([Fk_Qualification] = 1 or [Fk_Qualification] = 4))
+					in
+					    #"Linhas Filtradas"
+
+		changedProperty = IsHidden
+
+		annotation PBI_NavigationStepName = Navegação
+
+		annotation PBI_ResultType = Table
+
+	table Map_Role_Salary_Stage
+		lineageTag: e6630300-66ee-4186-b822-4008dc0f001c
+
+		column Role
+			lineageTag: 204d5150-bc37-429c-9d61-73a717eb420c
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [Role]
+
+			annotation SummarizationSetBy = Automatic
+
+		column Salary_Stage
+			lineageTag: 95e346b8-ea20-4d71-b8c3-c49907607e36
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [Salary_Stage]
+
+			annotation SummarizationSetBy = Automatic
+
+		column Stage_Order
+			formatString: 0
+			lineageTag: c93fae82-461d-48d4-b8ba-666d246663d8
+			summarizeBy: sum
+			isNameInferred
+			sourceColumn: [Stage_Order]
+
+			annotation SummarizationSetBy = Automatic
+
+		column Role_Stage
+			lineageTag: 654208d0-1a15-4e46-9fb8-ed4a7f2d8add
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [Role_Stage]
+			sortByColumn: Role_Stage_Order
+
+			annotation SummarizationSetBy = Automatic
+
+		column Role_Stage_Order
+			formatString: 0
+			lineageTag: 9ff9b569-e2ee-4581-85ba-f661857a1f73
+			summarizeBy: sum
+			isNameInferred
+			sourceColumn: [Role_Stage_Order]
+
+			annotation SummarizationSetBy = Automatic
+
+		partition Map_Role_Salary_Stage = calculated
+			mode: import
+			source = ```
+					
+					DATATABLE (
+					    "Role", STRING,
+					    "Salary_Stage", STRING,
+					    "Stage_Order", INTEGER,
+					    "Role_Stage", STRING,
+					    "Role_Stage_Order", INTEGER,
+					    {
+					        { "Teacher", "Starting salary", 1, "Teacher - Starting salary", 1 },
+					        { "Teacher", "After 10 years", 2, "Teacher - After 10 years", 2 },
+					        { "Teacher", "After 15 years", 3, "Teacher - After 15 years", 3 },
+					        { "Teacher", "At the top of the range", 4, "Teacher - At the top of the range", 4 },
+					        { "School Head", "Minimum", 1, "School Head - Minimum", 5 },
+					        { "School Head", "Maximum", 2, "School Head - Maximum", 6 }
+					    }
+					)
+					
+					```
+
+		annotation PBI_Id = 0593dedfc057407689dd3a8598a493e5
+

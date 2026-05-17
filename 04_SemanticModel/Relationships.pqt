@@ -1,0 +1,56 @@
+createOrReplace
+
+	relationship e51a8739-170c-3269-00a5-912eb721fcb2
+		fromColumn: Fact_Macro.Fk_Country
+		toColumn: Dim_Country.Sk_Country
+
+	relationship 0b5b32af-674e-d62e-bfa1-302c04b582d4
+		fromColumn: Fact_Salary.Fk_Country
+		toColumn: Dim_Country.Sk_Country
+
+	relationship 3330d015-81ab-0b4e-484f-ffec73e0b7f1
+		fromColumn: Fact_Salary.Fk_Currency
+		toColumn: Dim_Currency.Sk_Currency
+
+	relationship a7c088c8-2ae9-77a1-a2dd-7f498647211b
+		fromColumn: Fact_Macro.Fk_Indicator
+		toColumn: Dim_Indicator.Sk_Indicator
+
+	relationship af439abe-f344-ed9e-a455-7850a7e38c0a
+		fromColumn: Fact_Salary.Fk_Isced
+		toColumn: Dim_Isced.Sk_Isced
+
+	relationship ea730aed-9481-5b02-f0e1-0cb4eadff2ee
+		fromColumn: Fact_Salary.Fk_Qualification
+		toColumn: Dim_Qualification.Sk_Qualification
+
+	relationship ac2c9bc3-e390-99ab-6905-938d067659bb
+		fromColumn: Fact_Salary.Fk_Role
+		toColumn: Dim_Role.Sk_Role
+
+	relationship 17c0067c-3ff3-8b94-8dba-1c732f8be42e
+		fromColumn: Fact_Salary.Fk_Salary_Stage
+		toColumn: Dim_Salary_Stage.Sk_Salary_Stage
+
+	relationship 92238932-14af-8011-f38b-ba4c15fa2997
+		fromColumn: Fact_Salary.Fk_School_Size
+		toColumn: Dim_School_Size.Sk_School_Size
+
+	relationship eb982546-0b08-e3ba-760d-61b6ac5f841d
+		fromColumn: Fact_Salary.Fk_Year
+		toColumn: Dim_Year.Sk_Year
+
+	relationship 0c1151bc-04f6-aa17-16d8-0c18acc23f8c
+		fromColumn: Fact_Macro.Fk_Year
+		toColumn: Dim_Year.Sk_Year
+
+	relationship 57a14d04-b95f-0a95-ee3d-b78171b861ec
+		fromColumn: Map_Role_Salary_Stage.Role
+		toColumn: Dim_Role.Role
+
+	relationship a30a9be3-d0fa-3af7-7924-79a1d1609a0f
+		crossFilteringBehavior: bothDirections
+		securityFilteringBehavior: bothDirections
+		fromColumn: Map_Role_Salary_Stage.Salary_Stage
+		toColumn: Dim_Salary_Stage.Salary_Stage
+

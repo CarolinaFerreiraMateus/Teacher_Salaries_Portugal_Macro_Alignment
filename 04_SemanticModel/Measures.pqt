@@ -1,0 +1,786 @@
+createOrReplace
+
+	ref table Dim_Year
+
+		measure 'Earliest Year' = MIN(Dim_Year[Year])
+			formatString: 0
+			lineageTag: a6236be8-5547-4f8f-bea9-9004ae28d747
+
+		measure 'Latest Year' = MAX(Dim_Year[Year])
+			formatString: 0
+			lineageTag: 75da802a-59b0-4584-83ab-69da3b9e1355
+
+	ref table Fact_Macro
+
+		measure 'Average National Wage' =
+				
+				CALCULATE (
+				    AVERAGE ( Fact_Macro[Measure_Value] ),
+				    Dim_Indicator[Indicator] = "Average Annual Wages"
+				)
+			formatString: #,0.00
+			lineageTag: 30da2d1c-e357-409c-8d43-cfc0606e1270
+
+		measure 'Change in Relative Position (pp)' =
+				
+				VAR EarliestYear =
+				    CALCULATE(MIN(Dim_Year[Year]), ALL(Dim_Year))
+				VAR LatestYear =
+				    CALCULATE(MAX(Dim_Year[Year]), ALL(Dim_Year))
+				
+				VAR RatioLatest =
+				    CALCULATE(
+				        [Teacher to Avg Wage Ratio (%)],
+				        Dim_Year[Year] = LatestYear
+				    )
+				
+				VAR RatioBase =
+				    CALCULATE(
+				        [Teacher to Avg Wage Ratio (%)],
+				        Dim_Year[Year] = EarliestYear
+				    )
+				
+				RETURN
+				(RatioLatest - RatioBase) * 100
+			formatString: #,0.00
+			lineageTag: c2c62405-a859-4062-8279-78d670f06737
+
+		measure 'CPI Index' = CALCULATE(AVERAGE(Fact_Macro[Measure_Value]),Dim_Indicator[Indicator] = "Consumer Price Index (CPI)")
+			formatString: #,0.00
+			lineageTag: b775b0e8-1334-4dfb-aa3d-f4d5ee8e59c2
+
+		measure 'CPI YoY (%)' = ```
+				
+				VAR Prev =
+				    CALCULATE(
+				        [CPI Index],
+				        FILTER(
+				            ALL(Dim_Year),
+				            Dim_Year[Year] = MAX(Dim_Year[Year]) - 1
+				        )
+				    )
+				RETURN
+				DIVIDE([CPI Index] - Prev, Prev)
+				
+				```
+			formatString: #,0.00%;-#,0.00%;#,0.00%
+			lineageTag: 4566aac1-c2ad-44b1-86d8-f8888710ef42
+
+		measure 'Cumulative Inflation %' =
+				
+				VAR BaseYearCPI =
+				    CALCULATE(
+				        [CPI Index],
+				        FILTER(ALL(Dim_Year), Dim_Year[Year] = MIN(Dim_Year[Year]))
+				    )
+				VAR LastYear =
+				    CALCULATE(MAX(Dim_Year[Year]), ALL(Dim_Year))
+				VAR LastCPI =
+				    CALCULATE([CPI Index], Dim_Year[Year] = LastYear)
+				RETURN
+				DIVIDE(LastCPI - BaseYearCPI, BaseYearCPI)
+			formatString: #,0.00%;-#,0.00%;#,0.00%
+			lineageTag: 10acc261-d7f2-4ef1-94fa-12cad4c48fa6
+
+		measure 'Cumulative Nominal Salary Change %' =
+				
+				VAR FirstYear =
+				    CALCULATE(MIN(Dim_Year[Year]), ALL(Dim_Year))
+				VAR LastYear =
+				    CALCULATE(MAX(Dim_Year[Year]), ALL(Dim_Year))
+				VAR FirstValue =
+				    CALCULATE(
+				        [Nominal Salary (EUR)],
+				        FILTER(ALL(Dim_Year), Dim_Year[Year] = FirstYear)
+				    )
+				VAR LastValue =
+				    CALCULATE(
+				        [Nominal Salary (EUR)],
+				        FILTER(ALL(Dim_Year), Dim_Year[Year] = LastYear)
+				    )
+				RETURN
+				DIVIDE(LastValue - FirstValue, FirstValue)
+			formatString: 0.00%;-0.00%;0.00%
+			lineageTag: cf7d2337-ae52-40dc-b166-d86b8bf3b641
+
+		measure 'Cumulative Real Salary Change %' =
+				
+				VAR FirstYear =
+				    CALCULATE(MIN(Dim_Year[Year]), ALL(Dim_Year))
+				VAR LastYear =
+				    CALCULATE(MAX(Dim_Year[Year]), ALL(Dim_Year))
+				VAR FirstValue =
+				    CALCULATE(
+				        [Real Salary (CPI Adjusted)],
+				        FILTER(ALL(Dim_Year), Dim_Year[Year] = FirstYear)
+				    )
+				VAR LastValue =
+				    CALCULATE(
+				        [Real Salary (CPI Adjusted)],
+				        FILTER(ALL(Dim_Year), Dim_Year[Year] = LastYear)
+				    )
+				RETURN
+				DIVIDE(LastValue - FirstValue, FirstValue)
+			formatString: #,0.00%;-#,0.00%;#,0.00%
+			lineageTag: 6a3c37f5-4b16-4d06-91f0-05740080832d
+
+		measure 'Education Expenditure (% GDP)' = CALCULATE(AVERAGE(Fact_Macro[Measure_Value]),Dim_Indicator[Indicator]="Education Expenditure")/100
+			formatString: 0.00%;-0.00%;0.00%
+			lineageTag: a0175e4d-070a-4c1e-be04-a6551691b1db
+
+		measure 'Education Expenditure Change (pp)' =
+				
+				([Education Expenditure (% GDP)] -
+				    CALCULATE(
+				        [Education Expenditure (% GDP)],
+				        ALL(Dim_Year),
+				        Dim_Year[Year] = 2021
+				    )
+				) * 100
+			lineageTag: 3688e5c8-7779-4c75-ae12-d83da9b2969b
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'Education Expenditure Index (Base 2021)' =
+				
+				VAR BaseYear =
+				    CALCULATE(
+				        [Education Expenditure (% GDP)],
+				        ALL(Dim_Year),
+				        Dim_Year[Year] = 2021
+				    )
+				RETURN
+				    DIVIDE([Education Expenditure (% GDP)], BaseYear, 0) * 100
+			formatString: 0.00
+			lineageTag: 7d80e640-b9e8-4d4f-aa1c-c75a230efaa2
+
+		measure 'European Median Salary (PPS)' =
+				
+				MEDIANX(
+				    FILTER(
+				        ALL(Dim_Country),
+				        NOT ISBLANK([Salary (PPS)])
+				    ),
+				    [Salary (PPS)]
+				)
+			formatString: #,0.000
+			lineageTag: bec28205-b084-4e65-beb2-7ec628c1b565
+
+		measure GDP =
+				CALCULATE(AVERAGE(Fact_Macro[Measure_Value]),
+				        Dim_Indicator[Indicator] = "Gross Domestic Product (GDP) per Capita")
+			lineageTag: 272ea363-7576-49fb-a7c7-60bfe22a329b
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'GDP YoY Growth (%)' =
+				
+				VAR CurrYear = MAX ( Dim_Year[Year] )
+				VAR CurrGDP =
+				    CALCULATE (
+				        AVERAGE ( Fact_Macro[Measure_Value] ),
+				        Dim_Indicator[Indicator] = "Gross Domestic Product (GDP) per Capita"
+				    )
+				VAR PrevGDP =
+				    CALCULATE (
+				        AVERAGE ( Fact_Macro[Measure_Value] ),
+				        Dim_Indicator[Indicator] = "Gross Domestic Product (GDP) per Capita",
+				        FILTER (
+				            ALL ( Dim_Year ),
+				            Dim_Year[Year] = CurrYear - 1
+				        )
+				    )
+				RETURN
+				DIVIDE ( CurrGDP - PrevGDP, PrevGDP )
+			formatString: #,0.00%;-#,0.00%;#,0.00%
+			lineageTag: 0f96e7e8-31a8-40e2-9b26-0f7b63ca9207
+
+		measure 'Government Expenditure (% GDP)' =
+				
+				CALCULATE (
+				    AVERAGE ( Fact_Macro[Measure_Value] ),
+				    Dim_Indicator[Indicator] = "Government Expenditure"
+				)/100
+			formatString: 0.00%;-0.00%;0.00%
+			lineageTag: e783de3d-9236-4ea0-9c87-f1853bad11cf
+
+		measure 'House Price Index' =
+				
+				CALCULATE (
+				    AVERAGE ( Fact_Macro[Measure_Value] ),
+				    Dim_Indicator[Indicator] = "House Price Index (2015=100)"
+				)
+			formatString: #,0.00
+			lineageTag: bf62a41b-7fa1-487a-ab5a-92fb54e06dae
+
+		measure 'HPI (Base 2021)' = ```
+				
+				VAR Base =
+				    CALCULATE(
+				        [House Price Index],
+				        ALL(Dim_Year),
+				        Dim_Year[Year] = 2021
+				    )
+				RETURN
+				DIVIDE([House Price Index], Base) * 100
+				
+				```
+			formatString: #,0.00
+			lineageTag: 6565ef9b-31bf-4aea-87e8-806fdd7a6ee7
+
+		measure 'Latest National Average Wage' = CALCULATE([Average National Wage], Dim_Year[Year] = MAX(Dim_Year[Year]))
+			formatString: #,0.00
+			lineageTag: 00575cbe-2ea4-4e39-905a-5ff1156abd85
+
+		measure 'Latest Real Salary' = CALCULATE([Real Salary (CPI Adjusted)], Dim_Year[Year] = MAX(Dim_Year[Year]))
+			formatString: #,0.00
+			lineageTag: d9c73cf7-6104-4afd-8898-9ae4da25d1af
+
+		measure 'Latest Teacher vs National Wage Ratio (%)' =
+				
+				VAR LatestYear = MAX(Dim_Year[Year])
+				RETURN
+				CALCULATE(
+				    [Teacher to Avg Wage Ratio (%)],
+				    Dim_Year[Year] = LatestYear
+				)
+			formatString: #,0.00%;-#,0.00%;#,0.00%
+			lineageTag: ffc50a38-604b-4c70-a31a-5558e13d5c0f
+
+		measure 'Latest Wage Gap' =
+				
+				[Nominal Salary (EUR)] - [Average National Wage]
+			formatString: #,0.00
+			lineageTag: 9f61d4f2-a818-495e-9109-a33a06dcfa81
+
+		measure 'Median Earnings' =
+				
+				CALCULATE (
+				    AVERAGE ( Fact_Macro[Measure_Value] ),
+				    Dim_Indicator[Indicator] = "Median Annual Earnings"
+				)
+			formatString: #,0.00
+			lineageTag: 43e5bc8f-95eb-43f0-a1a7-b83107b195cc
+
+		measure 'National Wage vs GDP Cumulative Gap (pp)' =
+				
+				VAR Y0 = CALCULATE(MIN(Dim_Year[Year]), ALL(Dim_Year))
+				VAR YT = CALCULATE(MAX(Dim_Year[Year]), ALL(Dim_Year))
+				
+				VAR Wage0 = CALCULATE([Average National Wage], Dim_Year[Year] = Y0)
+				VAR WageT = CALCULATE([Average National Wage], Dim_Year[Year] = YT)
+				VAR WageCum = DIVIDE(WageT - Wage0, Wage0)
+				
+				VAR GDP0 =
+				    CALCULATE(
+				        AVERAGE(Fact_Macro[Measure_Value]),
+				        Dim_Indicator[Indicator] = "Gross Domestic Product (GDP) per Capita",
+				        Dim_Year[Year] = Y0
+				    )
+				VAR GDPT =
+				    CALCULATE(
+				        AVERAGE(Fact_Macro[Measure_Value]),
+				        Dim_Indicator[Indicator] = "Gross Domestic Product (GDP) per Capita",
+				        Dim_Year[Year] = YT
+				    )
+				VAR GDPCum = DIVIDE(GDPT - GDP0, GDP0)
+				
+				RETURN (WageCum - GDPCum) * 100
+			formatString: #,0.00
+			lineageTag: e1e0151e-9c34-4ac7-b2e5-23a4c27b827d
+
+		measure 'National Wage YoY Growth (%)' =
+				
+				VAR CurrYear = MAX ( Dim_Year[Year] )
+				VAR CurrValue =
+				    [Average National Wage]
+				VAR PrevValue =
+				    CALCULATE (
+				        [Average National Wage],
+				        FILTER (
+				            ALL ( Dim_Year ),
+				            Dim_Year[Year] = CurrYear - 1
+				        )
+				    )
+				RETURN
+				DIVIDE ( CurrValue - PrevValue, PrevValue )
+			formatString: #,0.00%;-#,0.00%;#,0.00%
+			lineageTag: 8c321832-6843-42cc-bfd5-d7199bf95c94
+
+		measure 'Nominal Salary YoY (%)' =
+				
+				VAR CurrentYear = SELECTEDVALUE(Dim_Year[Year])
+				VAR PrevYear = CurrentYear - 1
+				VAR PrevValue =
+				    CALCULATE ([Nominal Salary (EUR)],Dim_Year[Year]=PrevYear)
+				RETURN
+				IF (
+				    NOT ISBLANK (PrevValue),
+				    DIVIDE ([Nominal Salary (EUR)] - PrevValue, PrevValue )
+				)
+			formatString: #,0.00%;-#,0.00%;#,0.00%
+			lineageTag: b277a973-276a-459a-804a-276b02c5c4f5
+
+		measure 'Nominal vs CPI Growth Gap %' =
+				
+				([Nominal Salary YoY (%)] - [CPI YoY (%)])*100
+			formatString: #,0.00
+			lineageTag: fd0c015b-916c-41e8-951c-904aba43210a
+
+		measure 'PPP Index' =
+				CALCULATE (
+				    AVERAGE ( Fact_Macro[Measure_Value] ),
+				    Dim_Indicator[Indicator] = "Purchasing Power Parity (PPP)"
+				)
+			formatString: #,0.00
+			lineageTag: eedbc520-0fe8-4385-ad9e-a96bbc2a5f96
+
+		measure 'Purchasing Power Gap' = [Nominal Salary (EUR)] - [Real Salary (CPI Adjusted)]
+			formatString: #,0.00
+			lineageTag: ca444293-3985-4c5c-9aba-f1d5efb9768d
+
+		measure 'Real Salary (CPI Adjusted)' = DIVIDE([Nominal Salary (EUR)],[CPI Index]/100)
+			formatString: #,0.00
+			lineageTag: 076caceb-a653-4824-afaa-84e20e4528db
+
+		measure 'Real Salary Role Gap' =
+				
+				[School Head Real Salary] - [Teacher Real Salary]
+			formatString: #,0
+			lineageTag: 62888512-02cf-470b-b6a1-b051674ecd12
+
+			annotation PBI_FormatHint = {"isDecimal":true}
+
+		measure 'Real Salary Role Gap %' =
+				
+				DIVIDE(
+				    [School Head Real Salary] - [Teacher Real Salary],
+				    [Teacher Real Salary]
+				)
+			formatString: #,0.00%;-#,0.00%;#,0.00%
+			lineageTag: c6c91816-7e56-4790-9eb8-b8b3670602ca
+
+		measure 'Real Salary vs 2021 %' = ```
+				
+				VAR BaseYearValue =
+				    CALCULATE(
+				        [Real Salary (CPI Adjusted)],
+				        FILTER(ALL(Dim_Year), Dim_Year[Year] = 2021)
+				    )
+				RETURN
+				DIVIDE([Real Salary (CPI Adjusted)] - BaseYearValue, BaseYearValue)
+				
+				```
+			formatString: #,0.00%;-#,0.00%;#,0.00%
+			lineageTag: fc8825b0-7300-4eb5-9f68-8421aeb50d77
+
+		measure 'Real Salary YoY (%)' = ```
+				
+				VAR CurrentYear = SELECTEDVALUE ( Dim_Year[Year] )
+				VAR PrevYear = CurrentYear - 1
+				VAR PrevValue =
+				    CALCULATE ( [Real Salary (CPI Adjusted)], Dim_Year[Year] = PrevYear )
+				RETURN
+				IF (
+				    NOT ISBLANK ( PrevValue ),
+				    DIVIDE ( [Real Salary (CPI Adjusted)] - PrevValue, PrevValue )
+				)
+				
+				```
+			formatString: #,0.00%;-#,0.00%;#,0.00%
+			lineageTag: 43e49eef-9a97-40b3-b0eb-b2fa46e7c2ee
+
+		measure 'Reference Line (0%)' = 0
+			formatString: 0%;-0%;0%
+			lineageTag: 739f63d7-0d3f-4dcd-8610-c565e54f4d3d
+
+		measure 'Reference Line (100%)' = 1
+			formatString: #,0.00%;-#,0.00%;#,0.00%
+			lineageTag: ce257cf5-c251-4a0e-b9ad-73218663ff7c
+
+		measure 'Salary (PPS)' =
+				
+				VAR CurrentRole = SELECTEDVALUE(Dim_Role[Role])
+				
+				RETURN
+				DIVIDE([Nominal Salary (NCU)],
+				    [PPP Index]
+				)
+			formatString: #,0.00
+			lineageTag: c421f9c2-f03c-4445-9bce-d3546ee617ed
+
+		measure 'Salary Growth vs Inflation Gap (pp)' = ([Cumulative Nominal Salary Change %] - [Cumulative Inflation %])*100
+			formatString: 0.00
+			lineageTag: bf6f5c23-d8a7-4d88-8f4b-e3f505491131
+
+		measure 'Salary PT (PPS)' =
+				
+				CALCULATE(
+				    [Salary (PPS)],
+				    Dim_Country[Country_Code] = "PT"
+				)
+			lineageTag: fd2eb9a4-6738-475d-9323-e4e9a2b9a159
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'Salary vs GDP Cumulative Gap (pp)' =
+				
+				VAR Y0 = CALCULATE(MIN(Dim_Year[Year]), ALL(Dim_Year))
+				VAR YT = CALCULATE(MAX(Dim_Year[Year]), ALL(Dim_Year))
+				
+				-- Salary
+				VAR Salary0 = CALCULATE([Nominal Salary (EUR)], Dim_Year[Year] = Y0)
+				VAR SalaryT = CALCULATE([Nominal Salary (EUR)], Dim_Year[Year] = YT)
+				VAR SalaryCum = DIVIDE(SalaryT - Salary0, Salary0)
+				
+				-- GDP per Capita
+				VAR GDP0 =
+				    CALCULATE(
+				        AVERAGE(Fact_Macro[Measure_Value]),
+				        Dim_Indicator[Indicator] = "Gross Domestic Product (GDP) per Capita",
+				        Dim_Year[Year] = Y0
+				    )
+				
+				VAR GDPT =
+				    CALCULATE(
+				        AVERAGE(Fact_Macro[Measure_Value]),
+				        Dim_Indicator[Indicator] = "Gross Domestic Product (GDP) per Capita",
+				        Dim_Year[Year] = YT
+				    )
+				
+				VAR GDPCum = DIVIDE(GDPT - GDP0, GDP0)
+				
+				RETURN (SalaryCum - GDPCum) * 100
+			lineageTag: 90c71250-2afc-4d43-836d-5ea3230f2059
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'Salary vs National Wage Cumulative Gap (pp)' =
+				
+				VAR Y0 = CALCULATE(MIN(Dim_Year[Year]), ALL(Dim_Year))
+				VAR YT = CALCULATE(MAX(Dim_Year[Year]), ALL(Dim_Year))
+				
+				VAR Salary0 = CALCULATE([Nominal Salary (EUR)], Dim_Year[Year] = Y0)
+				VAR SalaryT = CALCULATE([Nominal Salary (EUR)], Dim_Year[Year] = YT)
+				
+				VAR Wage0 = CALCULATE([Average National Wage], Dim_Year[Year] = Y0)
+				VAR WageT = CALCULATE([Average National Wage], Dim_Year[Year] = YT)
+				
+				VAR SalaryCum = DIVIDE(SalaryT - Salary0, Salary0)
+				VAR WageCum   = DIVIDE(WageT - Wage0, Wage0)
+				
+				RETURN (SalaryCum - WageCum) * 100
+			formatString: #,0.00
+			lineageTag: ec10b96c-6514-405e-b4d9-9669c2b41e45
+
+		measure 'School Head Real Salary' =
+				
+				CALCULATE(
+				    [Real Salary (CPI Adjusted)],
+				    Dim_Role[Role] = "School Head"
+				)
+			formatString: #,0.00
+			lineageTag: 655bbb70-ee27-4972-9a22-d1a420194d75
+
+		measure 'Teacher Real Salary' =
+				
+				CALCULATE(
+				    [Real Salary (CPI Adjusted)],
+				    Dim_Role[Role] = "Teacher"
+				)
+			formatString: #,0.00
+			lineageTag: 9085dba4-203b-41d4-8f61-82771d68af3b
+
+		measure 'Teacher to Avg Wage Ratio (%)' =
+				
+				DIVIDE (
+				    [Nominal Salary (EUR)],
+				    [Average National Wage]
+				)
+			formatString: 0.00%;-0.00%;0.00%
+			lineageTag: 0793d51c-c6a8-43b7-87fe-71ca05bc9b5b
+
+		measure 'Teacher vs National %' =
+				
+				DIVIDE([Latest Nominal Salary], [Latest National Average Wage])
+			formatString: #,0.00%;-#,0.00%;#,0.00%
+			lineageTag: fe77dd11-66f3-4ac7-ab5d-563d994cbfd6
+
+	ref table Fact_Salary
+
+		measure 'Average School Head Salary' =
+				
+				CALCULATE(
+				    AVERAGE(Fact_Salary[Measure_Salary_EUR]),
+				    Dim_Role[Role] = "School Head"
+				)
+			formatString: #,0
+			lineageTag: 5d45719d-f93b-4e41-9f7d-0de53a26e6f8
+
+			changedProperty = IsHidden
+
+			annotation PBI_FormatHint = {"isDecimal":true}
+
+		measure 'Average Teacher Salary' =
+				
+				CALCULATE(
+				    AVERAGE(Fact_Salary[Measure_Salary_EUR]),
+				    Dim_Role[Role] = "Teacher"
+				)
+			formatString: #,0
+			lineageTag: 10ab97cd-b875-4d91-a022-caa9c8177bb6
+
+			changedProperty = IsHidden
+
+			annotation PBI_FormatHint = {"isDecimal":true}
+
+		measure 'Highest Paying Country Label' = ```
+				
+				VAR CountriesWithSalary =
+				    FILTER(
+				        ALL(Dim_Country),
+				        NOT ISBLANK([Salary (PPS)]) && [Salary (PPS)] > 0
+				    )
+				VAR TopCountry =
+				    TOPN(
+				        1,
+				        CountriesWithSalary,
+				        [Salary (PPS)],
+				        DESC
+				    )
+				VAR CountryName =
+				    MAXX(TopCountry, Dim_Country[Country_Name_Clean])
+				VAR SalaryValue =
+				    MAXX(TopCountry, [Salary (PPS)])
+				RETURN
+				CountryName
+				
+				```
+			lineageTag: 8bd258dd-70e7-4887-abcd-8de3465d6376
+
+			changedProperty = IsHidden
+
+		measure 'Latest Nominal Salary' = CALCULATE([Nominal Salary (EUR)], Dim_Year[Year] = MAX(Dim_Year[Year]))
+			formatString: #,0.00
+			lineageTag: 17ed636d-9b57-4107-8caa-7fced171ea4b
+
+			changedProperty = IsHidden
+
+		measure 'Lowest Paying Country (PPS)' = ```
+				
+				VAR CountriesWithSalary =
+				    FILTER(
+				        ALL(Dim_Country),
+				        NOT ISBLANK([Salary (PPS)]) && [Salary (PPS)] > 0
+				    )
+				VAR BottomCountry =
+				    TOPN(
+				        1,
+				        CountriesWithSalary,
+				        [Salary (PPS)],
+				        ASC
+				    )
+				VAR CountryName =
+				    MAXX(BottomCountry, Dim_Country[Country_Name_Clean])
+				VAR SalaryValue =
+				    MAXX(BottomCountry, [Salary (PPS)])
+				RETURN
+				CountryName
+				
+				```
+			lineageTag: d353d923-9537-486d-a775-dae902821751
+
+			changedProperty = IsHidden
+
+		measure 'Nominal Salary (EUR)' = AVERAGE(Fact_Salary[Measure_Salary_EUR])
+			formatString: #,0.00
+			lineageTag: 35e4648a-ccc5-48df-b445-8c4c449abc82
+
+			changedProperty = IsHidden
+
+		measure 'Nominal Salary (NCU)' = AVERAGE(Fact_Salary[Measure_Salary_NCU])
+			formatString: #,0.00
+			lineageTag: ee8d055d-2e5d-4bbd-958b-ac6386fe319c
+
+			changedProperty = IsHidden
+
+		measure 'Nominal Salary Index (Base 2021)' =
+				
+				VAR BaseYear =
+				    CALCULATE(
+				        [Nominal Salary (EUR)],
+				        ALL(Dim_Year),
+				        Dim_Year[Year] = 2021
+				    )
+				RETURN
+				    DIVIDE([Nominal Salary (EUR)], BaseYear, 0) * 100
+			formatString: 0.00
+			lineageTag: e6914b3d-0c01-47f2-960e-91ddfcc5e195
+
+		measure 'Nominal Salary Role Gap' = [Average School Head Salary] - [Average Teacher Salary]
+			formatString: #,0
+			lineageTag: 07e5bab6-f17a-4f15-839d-2a40e6ef25ed
+
+			changedProperty = IsHidden
+
+			annotation PBI_FormatHint = {"isDecimal":true}
+
+		measure 'Nominal Salary Role Gap %' =
+				
+				DIVIDE(
+				    [Average School Head Salary] - [Average Teacher Salary],
+				    [Average Teacher Salary]
+				)
+			formatString: #,0%;-#,0%;#,0%
+			lineageTag: 1b935eb4-5591-4de0-9de0-68d269293938
+
+			changedProperty = IsHidden
+
+		measure 'Nominal Salary YoY Growth (%)' =
+				
+				VAR CurrYear = MAX ( Dim_Year[Year] )
+				VAR CurrValue =
+				    [Nominal Salary (EUR)]
+				VAR PrevValue =
+				    CALCULATE (
+				        [Nominal Salary (EUR)],
+				        FILTER (
+				            ALL ( Dim_Year ),
+				            Dim_Year[Year] = CurrYear - 1
+				        )
+				    )
+				RETURN
+				DIVIDE ( CurrValue - PrevValue, PrevValue )
+			formatString: #,0.00%;-#,0.00%;#,0.00%
+			lineageTag: e5e0f9d7-bff1-469b-bd0f-bf66525c58ae
+
+			changedProperty = IsHidden
+
+		measure 'Ranking PT Position' =
+				
+				VAR CountriesWithData =
+				    FILTER(
+				        ALL(Dim_Country),
+				        NOT ISBLANK([Salary (PPS)]) &&
+				        [Salary (PPS)] > 0
+				    )
+				
+				VAR RankPT =
+				    CALCULATE(
+				        RANKX(
+				            CountriesWithData,
+				            [Salary (PPS)],
+				            ,
+				            DESC,
+				            DENSE
+				        ),
+				        Dim_Country[Country_Code] = "PT"
+				    )
+				
+				VAR LastTwoDigits = MOD(RankPT, 100)
+				VAR LastDigit = MOD(RankPT, 10)
+				
+				VAR Suffix =
+				    SWITCH(
+				        TRUE(),
+				        LastTwoDigits IN {11, 12, 13}, "th",
+				        LastDigit = 1, "st",
+				        LastDigit = 2, "nd",
+				        LastDigit = 3, "rd",
+				        "th"
+				    )
+				
+				RETURN
+				RankPT & Suffix
+			lineageTag: 3d0fe810-c671-46cd-9000-8493e1cc2ed7
+
+			changedProperty = IsHidden
+
+		measure 'Salary Highest Paying Country (PPS)' =
+				
+				CALCULATE(
+				    [Salary (PPS)],
+				    FILTER(
+				        ALL(Dim_Country),
+				        Dim_Country[Country_Name_Clean] = [Highest Paying Country Label]
+				    )
+				)
+			lineageTag: 5cc3b136-abf4-4fab-affb-34e9a16741f2
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'Salary Lowest Paying Country (PPS)' =
+				
+				CALCULATE(
+				    [Salary (PPS)],
+				    FILTER(
+				        ALL(Dim_Country),
+				        Dim_Country[Country_Name] = [Lowest Paying Country (PPS)]
+				    )
+				)
+			lineageTag: 6e21b453-6d97-4744-89a4-be2f35f55190
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'School Head Compression Ratio' =
+				
+				VAR TopSalary =
+				    CALCULATE(
+				        AVERAGE(Fact_Salary[Measure_Salary_EUR]),
+				        Dim_Role[Role] = "School Head",
+				        REMOVEFILTERS(Dim_Salary_Stage),
+				        Dim_Salary_Stage[Salary_Stage] = "Maximum"
+				    )
+				VAR StartSalary =
+				    CALCULATE(
+				        AVERAGE(Fact_Salary[Measure_Salary_EUR]),
+				        Dim_Role[Role] = "School Head",
+				        REMOVEFILTERS(Dim_Salary_Stage),
+				        Dim_Salary_Stage[Salary_Stage] = "Minimum"
+				    )
+				RETURN
+				DIVIDE(TopSalary, StartSalary)
+			formatString: #,0.00
+			lineageTag: bc495246-fc50-475e-8a31-217730c8c47e
+
+			changedProperty = IsHidden
+
+		measure 'Teacher Compression Ratio' =
+				
+				VAR TopSalary =
+				    CALCULATE(
+				        AVERAGE(Fact_Salary[Measure_Salary_EUR]),
+				        Dim_Role[Role] = "Teacher",
+				        REMOVEFILTERS(Dim_Salary_Stage),
+				        Dim_Salary_Stage[Salary_Stage] = "At the top of the range"
+				    )
+				VAR StartSalary =
+				    CALCULATE(
+				        AVERAGE(Fact_Salary[Measure_Salary_EUR]),
+				        Dim_Role[Role] = "Teacher",
+				        REMOVEFILTERS(Dim_Salary_Stage),
+				        Dim_Salary_Stage[Salary_Stage] = "Starting salary"
+				    )
+				RETURN
+				DIVIDE(TopSalary, StartSalary)
+			formatString: #,0.00
+			lineageTag: 540b2db0-9ff5-4b2c-89f2-0130a09bcd40
+
+			changedProperty = IsHidden
+
+		measure 'Teacher Salary Index (Base 2021)' = ```
+				
+				VAR BaseSalary =
+				    CALCULATE (
+				        [Nominal Salary (EUR)],
+				        FILTER ( ALL ( Dim_Year[Year] ), Dim_Year[Year] = 2021 )
+				    )
+				RETURN
+				    DIVIDE ( [Nominal Salary (EUR)], BaseSalary ) * 100
+				
+				```
+			formatString: #,0.00
+			lineageTag: c77c2a60-8f56-410e-b5bc-be965421aa9e
+
+			changedProperty = IsHidden
+
