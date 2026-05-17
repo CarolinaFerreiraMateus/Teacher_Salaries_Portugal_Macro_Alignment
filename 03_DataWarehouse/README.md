@@ -1,6 +1,6 @@
-# 03_DataWarehouse – Dimensional Model and Warehouse Loading
+# 03_DataWarehouse – Data Warehouse Loading
 
-This folder documents the dimensional data warehouse developed for the dissertation project.
+This folder documents the data warehouse developed for the dissertation project.
 
 The warehouse integrates educational salary data and macroeconomic indicators through a Kimball-based dimensional modeling approach implemented in Microsoft Fabric.
 
