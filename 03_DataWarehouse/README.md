@@ -65,14 +65,6 @@ The warehouse loading process included:
 
 ---
 
-## Main artifacts
-
-- Star-schema semantic model
-- Data warehouse loading pipeline
-- Referential integrity and validation procedures
-
----
-
 ## Relation to thesis
 
 This folder corresponds to the dimensional modeling and warehouse loading procedures described in Chapter 3 of the dissertation.
