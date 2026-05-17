@@ -6,12 +6,6 @@ This repository contains the technical artifacts developed for the master’s di
 
 The project investigates the extent to which teachers’ and school heads’ statutory salaries in Portugal evolved in alignment with key macroeconomic indicators between 2021 and 2024.
 
-The repository functions as a technical appendix to the dissertation and documents:
-- The ETL and staging procedures implemented in Microsoft Fabric;
-- The Kimball-based dimensional data warehouse;
-- The semantic model and analytical structures developed in Power BI;
-- The analytical dashboard artifact used for policy-oriented analysis.
-
 ---
 
 # 1. Research Question
@@ -36,7 +30,7 @@ The analytical architecture includes:
 - Data integration and staging procedures;
 - Dimensional data warehouse modeling;
 - Semantic layer development;
-- Interactive analytical dashboards.
+- Interactive analytical dashboard.
 
 ---
 
@@ -50,7 +44,6 @@ Teacher_Salaries_Portugal_Macro_Alignment/
 ├── 03_DataWarehouse/      Dimensional warehouse and loading processes
 ├── 04_SemanticModel/      Semantic layer and analytical metadata
 ├── 05_PowerBI/            Power BI dashboard artifact
-├── 06_Documentation/      Dissertation and supporting materials
 └── README.md
 ```
 
@@ -91,11 +84,11 @@ The analysis integrates data from:
 # 8. Author
 
 **Carolina Ferreira Mateus**  
-MSc Information Management — Business Intelligence  
+MSc Information Management - Business Intelligence  
 NOVA Information Management School (NOVA IMS)
 
 ---
 
 # 9. Supervisor
 
-Prof. Doutora Fátima Trindade Neves
+Prof. Fátima Trindade Neves
